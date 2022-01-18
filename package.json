@@ -1,0 +1,12 @@
+{
+  "name": "@saltcorn/select2",
+  "version": "0.1.0",
+  "description": "JSON field plugin",
+  "main": "index.js",
+  "dependencies": {
+    "@saltcorn/data": "^0.6.0",
+    "@saltcorn/markup": "^0.6.0"
+  },
+  "author": "Tom Nielsen",
+  "license": "MIT"
+}
