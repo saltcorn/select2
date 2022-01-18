@@ -1,7 +1,7 @@
 {
   "name": "@saltcorn/select2",
   "version": "0.1.0",
-  "description": "JSON field plugin",
+  "description": "Typeahead fieldviews based on select2",
   "main": "index.js",
   "dependencies": {
     "@saltcorn/data": "^0.6.0",

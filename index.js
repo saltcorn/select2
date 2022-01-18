@@ -6,6 +6,7 @@ const {
   text_attr,
   script,
   input,
+  domReady,
 } = require("@saltcorn/markup/tags");
 const tags = require("@saltcorn/markup/tags");
 const { select_options } = require("@saltcorn/markup/helpers");
@@ -59,19 +60,21 @@ const select2 = {
           placeholder: v || field.label,
         }) + span({ class: "ml-m1" }, "v")
       );
-    return tags.select(
-      {
-        class: `form-control ${cls} ${field.class || ""}`,
-        "data-fieldname": field.form_name,
-        name: text_attr(nm),
-        id: `input${text_attr(nm)}`,
-      },
-      select_options(
-        v,
-        field,
-        (attrs || {}).force_required,
-        (attrs || {}).neutral_label
-      )
+    return (
+      tags.select(
+        {
+          class: `form-control ${cls} ${field.class || ""}`,
+          "data-fieldname": field.form_name,
+          name: text_attr(nm),
+          id: `input${text_attr(nm)}`,
+        },
+        select_options(
+          v,
+          field,
+          (attrs || {}).force_required,
+          (attrs || {}).neutral_label
+        )
+      ) + script(domReady(`$('#input${text_attr(nm)}').select2();`))
     );
   },
 };
