@@ -74,7 +74,10 @@ const select2 = {
           (attrs || {}).force_required,
           (attrs || {}).neutral_label
         )
-      ) + script(domReady(`$('#input${text_attr(nm)}').select2();`))
+      ) +
+      script(
+        domReady(`$('#input${text_attr(nm)}').select2({ width: '100%' });`)
+      )
     );
   },
 };
