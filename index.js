@@ -66,6 +66,7 @@ const select2 = {
           class: `form-control ${cls} ${field.class || ""}`,
           "data-fieldname": field.form_name,
           name: text_attr(nm),
+          onChange: attrs.onChange,
           id: `input${text_attr(nm)}`,
         },
         select_options(
@@ -82,9 +83,11 @@ const select2 = {
   },
 };
 
+const fieldviews = { select2 };
+
 module.exports = {
   sc_plugin_api_version: 1,
-  fieldviews: { select2 },
+  fieldviews,
   plugin_name: "select2",
 
   headers: [
