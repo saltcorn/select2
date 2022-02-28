@@ -10,6 +10,8 @@ const {
 } = require("@saltcorn/markup/tags");
 const tags = require("@saltcorn/markup/tags");
 const { select_options } = require("@saltcorn/markup/helpers");
+const { features } = require("@saltcorn/data/db/state");
+const bs5 = features && features.bootstrap5;
 
 const select2 = {
   /** @type {string} */
@@ -97,5 +99,12 @@ module.exports = {
     {
       css: "/plugins/public/select2/select2.min.css",
     },
+    ...(bs5
+      ? [
+          {
+            css: "/plugins/public/select2/select2-bootstrap-5-theme.min.css",
+          },
+        ]
+      : []),
   ],
 };
