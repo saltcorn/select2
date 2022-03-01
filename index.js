@@ -97,7 +97,7 @@ module.exports = {
       script: "/plugins/public/select2/select2.min.js",
     },
     {
-      css: "/plugins/public/select2/select2.min.css",
+      css: "/plugins/public/select2/select2-1.min.css",
     },
     ...(bs5
       ? [
