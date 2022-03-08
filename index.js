@@ -79,7 +79,13 @@ const select2 = {
         )
       ) +
       script(
-        domReady(`$('#input${text_attr(nm)}').select2({ width: '100%' });`)
+        domReady(
+          `$('#input${text_attr(
+            nm
+          )}').select2({ width: '100%', dropdownParent: $('#input${text_attr(
+            nm
+          )}').parent() });`
+        )
       )
     );
   },
