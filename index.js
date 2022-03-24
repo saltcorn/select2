@@ -6,6 +6,7 @@ const {
   text_attr,
   script,
   input,
+  style,
   domReady,
 } = require("@saltcorn/markup/tags");
 const tags = require("@saltcorn/markup/tags");
@@ -31,6 +32,11 @@ const select2 = {
       name: "where",
       label: "Where",
       type: "String",
+    },
+    {
+      name: "maxHeight",
+      label: "max-height px",
+      type: "Integer",
     },
     {
       name: "force_required",
@@ -84,9 +90,18 @@ const select2 = {
             nm
           )}').select2({ width: '100%', dropdownParent: $('#input${text_attr(
             nm
-          )}').parent() });`
+          )}').parent(), dropdownCssClass: "select2-dd-${text_attr(nm)}"  });`
         )
-      )
+      ) +
+      (attrs?.maxHeight
+        ? style(
+            `.select2-container--default .select2-dd-${text_attr(
+              nm
+            )} .select2-results>.select2-results__options {max-height: ${
+              attrs?.maxHeight
+            }px;}`
+          )
+        : "")
     );
   },
 };
