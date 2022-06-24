@@ -45,6 +45,13 @@ const select2 = {
         "User must select a value, even if the table field is not required",
       type: "Bool",
     },
+    {
+      name: "label_formula",
+      label: "Label formula",
+      type: "String",
+      class: "validate-expression",
+      sublabel: "Uses summary field if blank",
+    },
   ],
 
   /**
