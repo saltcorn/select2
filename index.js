@@ -19,9 +19,12 @@ const select2 = {
   type: "Key",
   /** @type {boolean} */
   isEdit: true,
+  blockDisplay: true,
+
   /**
    * @type {object[]}
    */
+
   configFields: () => [
     {
       name: "neutral_label",
@@ -75,6 +78,7 @@ const select2 = {
           placeholder: v || field.label,
         }) + span({ class: "ml-m1" }, "v")
       );
+    //console.log("select2 attrs", attrs);
     return (
       tags.select(
         {
@@ -83,6 +87,14 @@ const select2 = {
           name: text_attr(nm),
           onChange: attrs.onChange,
           id: `input${text_attr(nm)}`,
+          ...(attrs?.dynamic_where
+            ? {
+                "data-selected": v,
+                "data-fetch-options": encodeURIComponent(
+                  JSON.stringify(attrs?.dynamic_where)
+                ),
+              }
+            : {}),
         },
         select_options(
           v,
