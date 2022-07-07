@@ -148,6 +148,12 @@ const run = async (
             width: '100%', 
             dropdownParent: $('#${rndid}').parent(), 
             dropdownCssClass: "select2-dd-${rndid}"
+        });
+        $('#${rndid}').on('select2:unselect', function (e) {
+            view_post('${viewname}', 'remove', {id:'${id}', value: e.params.data.id});
+        });
+        $('#${rndid}').on('select2:select', function (e) {
+            view_post('${viewname}', 'add', {id:'${id}', value: e.params.data.id});
         });`
       )
     ) +
