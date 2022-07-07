@@ -122,7 +122,7 @@ const run = async (
   const rows = await table.getJoinedRows({
     where: { id },
     aggregations: {
-      _badges: {
+      _selected: {
         table: joinField.reftable_name,
         ref: "id",
         subselect: {
@@ -136,11 +136,11 @@ const run = async (
     },
   });
   const possibles = await joinedTable.distinctValues(valField);
-
+  const selected = new Set(rows[0]._selected || []);
   return (
     select(
       { id: rndid, multiple: "multiple" },
-      possibles.map((p) => option(p))
+      possibles.map((p) => option({ selected: selected.has(p) }, p))
     ) +
     script(
       domReady(
