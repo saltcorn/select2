@@ -40,7 +40,7 @@ const configuration_workflow = () =>
             const keyFields = table.fields.filter(
               (f) =>
                 f.type === "Key" &&
-                ![mytable.name, "_sc_files"].includes(f.reftable_name)
+                !["_sc_files"].includes(f.reftable_name)
             );
             for (const kf of keyFields) {
               const joined_table = await Table.findOne({
@@ -159,73 +159,11 @@ const run = async (
     ) +
     (maxHeight
       ? style(
-          `.select2-container--default .select2-dd-${rndid} .select2-results>.select2-results__options {max-height: ${maxHeight}px;}`
-        )
+        `.select2-container--default .select2-dd-${rndid} .select2-results>.select2-results__options {max-height: ${maxHeight}px;}`
+      )
       : "")
   );
 
-  const existing = (rows[0]._badges || [])
-    .map(
-      (b) =>
-        span(
-          {
-            class: [
-              "badge",
-              bs5 ? "bg-secondary" : "badge-secondary",
-              size,
-              rounded_pill && "rounded-pill",
-            ],
-          },
-          b,
-          a(
-            {
-              onclick: `(function(that){view_post('${viewname}', 'remove', {id:'${id}', value: '${b}'}, function(){$(that).closest('span').remove()})})(this);`,
-            },
-            i({ class: "ms-1 fas fa-lg fa-times" })
-          )
-        ) + "&nbsp;"
-    )
-    .join("");
-
-  const addbadge =
-    span(
-      { class: "dropdown" },
-      span(
-        {
-          class: [
-            "badge",
-            bs5 ? "bg-secondary" : "badge-secondary",
-            "dropdown-toggle",
-            size,
-            rounded_pill && "rounded-pill",
-          ],
-          "data-bs-toggle": "dropdown",
-          id: rndid,
-          "aria-haspopup": "true",
-          "aria-expanded": "false",
-        },
-        i({ class: "fas fa-lg fa-plus" })
-      ),
-      div(
-        { class: "dropdown-menu", "aria-labelledby": rndid },
-        possibles
-          .map((p) =>
-            a(
-              {
-                class: "dropdown-item",
-                onclick: `set_add_badge_${rndid}('${p}')`,
-              },
-              p
-            )
-          )
-          .join("")
-      )
-    ) +
-    script(`function set_add_badge_${rndid}(value) {
-    view_post('${viewname}', 'add', {id:'${id}', value: value}, function(){location.reload();})
-  }
-  `);
-  return existing + addbadge;
 };
 
 const remove = async (table_id, viewname, { relation }, { id, value }) => {
