@@ -15,6 +15,8 @@ const Workflow = require("@saltcorn/data/models/workflow");
 const Table = require("@saltcorn/data/models/table");
 const Form = require("@saltcorn/data/models/form");
 const Field = require("@saltcorn/data/models/field");
+const { jsexprToWhere } = require("@saltcorn/data/models/expression");
+
 const db = require("@saltcorn/data/db");
 const {
   stateFieldsToWhere,
@@ -39,8 +41,7 @@ const configuration_workflow = () =>
           for (const { table, key_field } of child_relations) {
             const keyFields = table.fields.filter(
               (f) =>
-                f.type === "Key" &&
-                !["_sc_files"].includes(f.reftable_name)
+                f.type === "Key" && !["_sc_files"].includes(f.reftable_name)
             );
             for (const kf of keyFields) {
               const joined_table = await Table.findOne({
@@ -76,6 +77,12 @@ const configuration_workflow = () =>
                 label: "max-height px",
                 type: "Integer",
               },
+              {
+                name: "where",
+                label: "Where",
+                type: "String",
+                class: "validate-expression",
+              },
             ],
           });
         },
@@ -93,7 +100,7 @@ const get_state_fields = async (table_id, viewname, { columns }) => [
 const run = async (
   table_id,
   viewname,
-  { relation, maxHeight },
+  { relation, maxHeight, where },
   state,
   extra
 ) => {
@@ -135,7 +142,10 @@ const run = async (
       },
     },
   });
-  const possibles = await joinedTable.distinctValues(valField);
+  const possibles = await joinedTable.distinctValues(
+    valField,
+    where ? jsexprToWhere(where, {}, joinedTable.getFields()) : undefined
+  );
   const selected = new Set(rows[0]._selected || []);
   return (
     select(
@@ -159,11 +169,10 @@ const run = async (
     ) +
     (maxHeight
       ? style(
-        `.select2-container--default .select2-dd-${rndid} .select2-results>.select2-results__options {max-height: ${maxHeight}px;}`
-      )
+          `.select2-container--default .select2-dd-${rndid} .select2-results>.select2-results__options {max-height: ${maxHeight}px;}`
+        )
       : "")
   );
-
 };
 
 const remove = async (table_id, viewname, { relation }, { id, value }) => {
