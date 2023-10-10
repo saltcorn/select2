@@ -125,7 +125,6 @@ const run = async (
   await relTable.getFields();
   const joinField = relTable.fields.find((f) => f.name === joinFieldNm);
   const joinedTable = await Table.findOne({ name: joinField.reftable_name });
-  console.log("hello");
   const rows = await table.getJoinedRows({
     where: { id },
     aggregations: {
@@ -142,13 +141,11 @@ const run = async (
       },
     },
   });
-  console.log({ rows });
 
   const possibles = await joinedTable.distinctValues(
     valField,
     where ? jsexprToWhere(where, {}, joinedTable.getFields()) : undefined
   );
-  console.log({ possibles });
 
   const selected = new Set(rows[0]._selected || []);
   return (
