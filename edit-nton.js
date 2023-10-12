@@ -15,7 +15,10 @@ const Workflow = require("@saltcorn/data/models/workflow");
 const Table = require("@saltcorn/data/models/table");
 const Form = require("@saltcorn/data/models/form");
 const Field = require("@saltcorn/data/models/field");
-const { jsexprToWhere } = require("@saltcorn/data/models/expression");
+const {
+  jsexprToWhere,
+  eval_expression,
+} = require("@saltcorn/data/models/expression");
 
 const db = require("@saltcorn/data/db");
 const {
@@ -83,6 +86,15 @@ const configuration_workflow = () =>
                 type: "String",
                 class: "validate-expression",
               },
+              {
+                name: "field_values_formula",
+                label: "Row values formula",
+                class: "validate-expression",
+                sublabel:
+                  "Optional. A formula for field values set when creating a new join table row. For example <code>{name: manager}</code>",
+                type: "String",
+                fieldview: "textarea",
+              },
             ],
           });
         },
@@ -106,6 +118,8 @@ const run = async (
 ) => {
   const { id } = state;
   if (!id) return "need id";
+  const req = extra.req;
+
   if (!relation) {
     throw new Error(
       `Select2 many-to-many view ${viewname} incorrectly configured. No relation chosen`
@@ -127,6 +141,8 @@ const run = async (
   const joinedTable = await Table.findOne({ name: joinField.reftable_name });
   const rows = await table.getJoinedRows({
     where: { id },
+    forPublic: !req.user || req.user.role_id === 100, // TODO in mobile set user null for public
+    forUser: req.user,
     aggregations: {
       _selected: {
         table: joinField.reftable_name,
@@ -141,10 +157,17 @@ const run = async (
       },
     },
   });
+  if (!rows[0]) return "No row selected";
 
   const possibles = await joinedTable.distinctValues(
     valField,
-    where ? jsexprToWhere(where, {}, joinedTable.getFields()) : undefined
+    where
+      ? jsexprToWhere(
+          where,
+          { ...rows[0], user: req.user },
+          joinedTable.getFields()
+        )
+      : undefined
   );
 
   const selected = new Set(rows[0]._selected || []);
@@ -194,7 +217,24 @@ const remove = async (table_id, viewname, { relation }, { id, value }) => {
   );
   return { json: { success: "ok" } };
 };
-const add = async (table_id, viewname, { relation }, { id, value }) => {
+const add = async (
+  table_id,
+  viewname,
+  { relation, field_values_formula },
+  { id, value },
+  { req }
+) => {
+  const table = await Table.findOne({ id: table_id });
+  const rows = await table.getJoinedRows({
+    where: { id },
+    forPublic: !req.user || req.user.role_id === 100, // TODO in mobile set user null for public
+    forUser: req.user,
+  });
+  if (!rows[0]) return { json: { error: "Row not found" } };
+  let extra = {};
+  if (field_values_formula) {
+    extra = eval_expression(field_values_formula, rows[0], req.user);
+  }
   const relSplit = relation.split(".");
   const [joinTableNm, relField, joinFieldNm, valField] = relSplit;
   const joinTable = await Table.findOne({ name: joinTableNm });
@@ -202,7 +242,11 @@ const add = async (table_id, viewname, { relation }, { id, value }) => {
   const joinField = joinTable.fields.find((f) => f.name === joinFieldNm);
   const joinedTable = await Table.findOne({ name: joinField.reftable_name });
   const joinedRow = await joinedTable.getRow({ [valField]: value });
-  await joinTable.insertRow({ [relField]: id, [joinFieldNm]: joinedRow.id });
+  await joinTable.insertRow({
+    [relField]: id,
+    [joinFieldNm]: joinedRow.id,
+    ...extra,
+  });
   return { json: { success: "ok" } };
 };
 
