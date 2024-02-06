@@ -95,6 +95,11 @@ const configuration_workflow = () =>
                 type: "String",
                 fieldview: "textarea",
               },
+              {
+                name: "disabled",
+                label: "Disabled",
+                type: "Bool",
+              },
             ],
           });
         },
@@ -112,7 +117,7 @@ const get_state_fields = async (table_id, viewname, { columns }) => [
 const run = async (
   table_id,
   viewname,
-  { relation, maxHeight, where },
+  { relation, maxHeight, where, disabled },
   state,
   extra
 ) => {
@@ -180,6 +185,7 @@ const run = async (
       domReady(
         `$('#${rndid}').select2({ 
             width: '100%', 
+            ${disabled ? "disabled: true," : ""}
             dropdownParent: $('#${rndid}').parent(), 
             dropdownCssClass: "select2-dd-${rndid}"
         });
