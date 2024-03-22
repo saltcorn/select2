@@ -174,7 +174,11 @@ const run = async (
         )
       : undefined
   );
-
+  possibles.sort((a, b) => {
+    const fa = a?.toLowerCase?.();
+    const fb = b?.toLowerCase?.();
+    return fa > fb ? 1 : fb > fa ? -1 : 0;
+  });
   const selected = new Set(rows[0]._selected || []);
   return (
     select(
