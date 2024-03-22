@@ -252,12 +252,17 @@ const add = async (
   const joinField = joinTable.fields.find((f) => f.name === joinFieldNm);
   const joinedTable = await Table.findOne({ name: joinField.reftable_name });
   const joinedRow = await joinedTable.getRow({ [valField]: value });
-  await joinTable.insertRow({
-    [relField]: id,
-    [joinFieldNm]: joinedRow.id,
-    ...extra,
-  });
-  return { json: { success: "ok" } };
+  const result = {};
+  await joinTable.insertRow(
+    {
+      [relField]: id,
+      [joinFieldNm]: joinedRow.id,
+      ...extra,
+    },
+    req.user || { role_id: 100 },
+    result
+  );
+  return { json: { success: "ok", ...result } };
 };
 
 module.exports = {
