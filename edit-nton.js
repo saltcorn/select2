@@ -182,7 +182,7 @@ const run = async (
   const selected = new Set(rows[0]._selected || []);
   return (
     select(
-      { id: rndid, multiple: "multiple" },
+      { id: rndid, multiple: "multiple", class: "no-form-change" },
       possibles.map((p) => option({ selected: selected.has(p) }, p))
     ) +
     script(
