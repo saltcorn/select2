@@ -12,6 +12,7 @@ const {
 const tags = require("@saltcorn/markup/tags");
 const { select_options } = require("@saltcorn/markup/helpers");
 const { features } = require("@saltcorn/data/db/state");
+const Table = require("@saltcorn/data/models/table");
 const bs5 = features && features.bootstrap5;
 
 const select2 = {
@@ -30,6 +31,11 @@ const select2 = {
       name: "neutral_label",
       label: "Neutral label",
       type: "String",
+    },
+    {
+      name: "ajax",
+      label: "Ajax fetch options",
+      type: "Bool",
     },
     {
       name: "where",
@@ -78,7 +84,8 @@ const select2 = {
           placeholder: v || field.label,
         }) + span({ class: "ml-m1" }, "v")
       );
-    //console.log("select2 attrs", attrs);
+    //console.log("select2 attrs", attrs, field);
+
     return (
       tags.select(
         {
@@ -96,20 +103,56 @@ const select2 = {
               }
             : {}),
         },
-        select_options(
-          v,
-          field,
-          (attrs || {}).force_required,
-          (attrs || {}).neutral_label
-        )
+        attrs.ajax
+          ? select_options(
+              v,
+              { ...field, options: field.options.filter((o) => o.value == v) },
+              (attrs || {}).force_required,
+              (attrs || {}).neutral_label
+            )
+          : select_options(
+              v,
+              field,
+              (attrs || {}).force_required,
+              (attrs || {}).neutral_label
+            )
       ) +
       script(
         domReady(
-          `$('#input${text_attr(
-            nm
-          )}').select2({ width: '100%', dropdownParent: $('#input${text_attr(
-            nm
-          )}').parent(), dropdownCssClass: "select2-dd-${text_attr(nm)}"  });`
+          `$('#input${text_attr(nm)}').select2({ 
+            width: '100%', 
+            ${
+              attrs.ajax
+                ? ` minimumInputLength: 2,
+            minimumResultsForSearch: 10,
+            ajax: {
+                url: "/api/${field.reftable_name}",
+                dataType: "json",
+                type: "GET",
+                data: function (params) {
+        
+                    var queryParameters = {
+                        ${field.attributes.summary_field}: params.term,
+                        approximate: true
+                    }
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    if(!data || !data.success) return [];
+                    return {
+                        results: $.map(data.success, function (item) {
+                            return {
+                                text: item.${field.attributes.summary_field},
+                                id: item.id
+                            }
+                        })
+                    };
+                  }},`
+                : ""
+            }
+            dropdownParent: $('#input${text_attr(
+              nm
+            )}').parent(), dropdownCssClass: "select2-dd-${text_attr(nm)}"  });`
         )
       ) +
       (attrs?.maxHeight
