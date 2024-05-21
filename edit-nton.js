@@ -87,6 +87,11 @@ const configuration_workflow = () =>
                 class: "validate-expression",
               },
               {
+                name: "ajax",
+                label: "Ajax fetch options",
+                type: "Bool",
+              },
+              {
                 name: "field_values_formula",
                 label: "Row values formula",
                 class: "validate-expression",
@@ -117,7 +122,7 @@ const get_state_fields = async (table_id, viewname, { columns }) => [
 const run = async (
   table_id,
   viewname,
-  { relation, maxHeight, where, disabled },
+  { relation, maxHeight, where, disabled, ajax },
   state,
   extra
 ) => {
@@ -163,17 +168,21 @@ const run = async (
     },
   });
   if (!rows[0]) return "No row selected";
-
-  const possibles = await joinedTable.distinctValues(
-    valField,
-    where
-      ? jsexprToWhere(
-          where,
-          { ...rows[0], user: req.user },
-          joinedTable.getFields()
-        )
-      : undefined
-  );
+  let possibles = [];
+  if (!ajax) {
+    possibles = await joinedTable.distinctValues(
+      valField,
+      where
+        ? jsexprToWhere(
+            where,
+            { ...rows[0], user: req.user },
+            joinedTable.getFields()
+          )
+        : undefined
+    );
+  } else {
+    possibles = rows[0]._selected || [];
+  }
   possibles.sort((a, b) => {
     const fa = a?.toLowerCase?.();
     const fb = b?.toLowerCase?.();
@@ -191,7 +200,36 @@ const run = async (
             width: '100%', 
             ${disabled ? "disabled: true," : ""}
             dropdownParent: $('#${rndid}').parent(), 
-            dropdownCssClass: "select2-dd-${rndid}"
+            dropdownCssClass: "select2-dd-${rndid}",
+            ${
+              ajax
+                ? ` minimumInputLength: 2,
+            minimumResultsForSearch: 10,
+            ajax: {
+                url: "/api/${joinedTable.name}",
+                dataType: "json",
+                type: "GET",
+                data: function (params) {
+        
+                    var queryParameters = {
+                        ${valField}: params.term,
+                        approximate: true
+                    }
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    if(!data || !data.success) return [];
+                    return {
+                        results: $.map(data.success, function (item) {
+                            return {
+                                text: item.${valField},
+                                id: item.${valField}
+                            }
+                        })
+                    };
+                  }},`
+                : ""
+            }
         });
         $('#${rndid}').on('select2:unselect', function (e) {
             view_post('${viewname}', 'remove', {id:'${id}', value: e.params.data.id});
