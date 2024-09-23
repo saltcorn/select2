@@ -105,6 +105,12 @@ const configuration_workflow = () =>
                 label: "Disabled",
                 type: "Bool",
               },
+              {
+                name: "stay_open_on_select",
+                label: "Stay open",
+                sublabel: "Do not close on select",
+                type: "Bool",
+              },
             ],
           });
         },
@@ -122,7 +128,7 @@ const get_state_fields = async (table_id, viewname, { columns }) => [
 const run = async (
   table_id,
   viewname,
-  { relation, maxHeight, where, disabled, ajax },
+  { relation, maxHeight, where, disabled, ajax, stay_open_on_select },
   state,
   extra
 ) => {
@@ -199,6 +205,7 @@ const run = async (
         `$('#${rndid}').select2({ 
             width: '100%', 
             ${disabled ? "disabled: true," : ""}
+            ${stay_open_on_select ? "closeOnSelect: false," : ""}
             dropdownParent: $('#${rndid}').parent(), 
             dropdownCssClass: "select2-dd-${rndid}",
             ${
