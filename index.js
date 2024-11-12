@@ -168,7 +168,7 @@ const select2 = {
   },
 };
 
-const fieldviews = { select2 };
+const fieldviews = { select2, select2_filter: require("./filter") };
 
 module.exports = {
   sc_plugin_api_version: 1,
