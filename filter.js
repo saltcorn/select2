@@ -18,12 +18,14 @@ module.exports = {
   isEdit: false,
   configFields: [
     { name: "multiple", label: "Multiple", type: "Bool" },
+    /*
+    //Doesnt work
     {
       name: "stay_open_on_select",
       label: "Stay open",
       sublabel: "Do not close on select",
       type: "Bool",
-    },
+    },*/
   ],
   run: (nm, v, attrs = {}, cls, required, field, state = {}) => {
     const selected = Array.isArray(v)
