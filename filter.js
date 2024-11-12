@@ -16,32 +16,51 @@ module.exports = {
   type: "Key",
   isFilter: true,
   isEdit: false,
-  configFields: [{ name: "multiple", label: "Multiple", type: "Bool" }],
+  configFields: [
+    { name: "multiple", label: "Multiple", type: "Bool" },
+    {
+      name: "stay_open_on_select",
+      label: "Stay open",
+      sublabel: "Do not close on select",
+      type: "Bool",
+    },
+  ],
   run: (nm, v, attrs = {}, cls, required, field, state = {}) => {
-    const rndid = Math.floor(Math.random() * 16777215).toString(16);
+    const selected = Array.isArray(v)
+      ? v
+      : typeof v === "undefined" || v === null
+      ? []
+      : [v];
+
+    const options = (field.options || []).map((o) =>
+      option({ value: o.value, selected: selected.includes(o.value) }, o.label)
+    );
+
     return (
       select(
         {
-          id: `input${text_attr(nm)}`,
+          id: `input${text_attr(nm)}filter`,
           class: `form-control ${cls} ${field.class || ""}`,
-          //onChange: "select2_filter_change(this)",
           multiple: attrs.multiple ? "multiple" : undefined,
         },
-        select_options(
-          v,
-          field,
-          (attrs || {}).force_required,
-          (attrs || {}).neutral_label
-        )
+        options
       ) +
       script(
-        domReady(`$('#input${text_attr(nm)}').select2({ 
+        domReady(`
+      function update() {
+       const selected = $('#input${text_attr(
+         nm
+       )}filter').select2('data');       
+       const sel_ids = selected.map(s=>s.id);
+       set_state_field("${nm}", sel_ids, $("#input${text_attr(nm)}filter"))
+      }      
+      $('#input${text_attr(nm)}filter').select2({ 
             width: '100%',
-      }).on('select2:select', function (e) {
-       var data = e.params.data;
-       console.log("data", data);
-
-      });
+            ${attrs.stay_open_on_select ? "closeOnSelect: false," : ""}
+            dropdownParent: $('#input${text_attr(
+              nm
+            )}filter').parent(),             
+      }).on('select2:select', update).on('select2:unselect', update);
 `)
       )
     );
