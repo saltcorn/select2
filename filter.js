@@ -58,7 +58,6 @@ module.exports = {
       }      
       $('#input${text_attr(nm)}filter').select2({ 
             width: '100%',
-            theme: "bootstrap-5",
             ${attrs.stay_open_on_select ? "closeOnSelect: false," : ""}
             dropdownParent: $('#input${text_attr(
               nm

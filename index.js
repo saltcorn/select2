@@ -121,7 +121,6 @@ const select2 = {
         domReady(
           `$('#input${text_attr(nm)}').select2({ 
             width: '100%', 
-            theme: "bootstrap-5",
             ${
               attrs.ajax
                 ? ` minimumInputLength: 2,
