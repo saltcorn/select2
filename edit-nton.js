@@ -204,6 +204,7 @@ const run = async (
       domReady(
         `$('#${rndid}').select2({ 
             width: '100%', 
+            theme: "bootstrap-5",
             ${disabled ? "disabled: true," : ""}
             ${stay_open_on_select ? "closeOnSelect: false," : ""}
             dropdownParent: $('#${rndid}').parent(), 
