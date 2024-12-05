@@ -170,6 +170,10 @@ const select2 = {
 
 const fieldviews = { select2, select2_filter: require("./filter") };
 
+const base_headers = `/plugins/public/select2@${
+  require("./package.json").version
+}`;
+
 module.exports = {
   sc_plugin_api_version: 1,
   fieldviews,
@@ -177,17 +181,10 @@ module.exports = {
   viewtemplates: [require("./edit-nton")],
   headers: [
     {
-      script: "/plugins/public/select2/select2.min.js",
+      script: `${base_headers}/select2.min.js`,
     },
     {
-      css: "/plugins/public/select2/select2-1.min.css",
+      css: `${base_headers}/select2.min.css`,
     },
-    ...(bs5
-      ? [
-          {
-            css: "/plugins/public/select2/select2-bootstrap-5-theme.min.css",
-          },
-        ]
-      : []),
   ],
 };
