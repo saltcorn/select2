@@ -178,7 +178,7 @@ module.exports = {
   sc_plugin_api_version: 1,
   fieldviews,
   plugin_name: "select2",
-  viewtemplates: [require("./edit-nton")],
+  viewtemplates: [require("./edit-nton"), require("./select_and_run_action")],
   headers: [
     {
       script: `${base_headers}/select2.min.js`,
