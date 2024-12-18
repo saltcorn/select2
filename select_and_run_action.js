@@ -6,6 +6,7 @@ const {
   script,
   domReady,
   di,
+  div,
   select,
   option,
   style,
@@ -121,27 +122,37 @@ const run = async (
   if (!rows[0]) return "No row selected";
 
   return (
-    select(
-      { id: rndid },
-      rows.map((row) =>
-        option({ value: row[table.pk_name] }, interpolate(label, row, req.user))
+    div(
+      { class: "d-flex" },
+      select(
+        { id: rndid },
+        rows.map((row) =>
+          option(
+            { value: row[table.pk_name] },
+            interpolate(label, row, req.user)
+          )
+        )
+      ),
+      button(
+        { class: "btn btn-secondary", onclick: `select_and_run_${rndid}()` },
+        "OK"
       )
     ) +
     script(
-      domReady(
-        `$('#${rndid}').select2({ 
+      `function select_and_run_${rndid}() {
+            const id = $('#${rndid}').val();
+            view_post('${viewname}', 'go', {id, state: ${JSON.stringify(
+        state
+      )}})
+        }` +
+        domReady(
+          `$('#${rndid}').select2({ 
             width: '100%', 
             dropdownParent: $('#${rndid}').parent(), 
             dropdownCssClass: "select2-dd-${rndid}",
 
-        });
-       
-        $('#${rndid}').on('select2:select', function (e) {
-            view_post('${viewname}', 'go', {id: e.params.data.id, state: ${JSON.stringify(
-          state
-        )}});
         });`
-      )
+        )
     )
   );
 };
