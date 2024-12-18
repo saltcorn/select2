@@ -134,7 +134,11 @@ const run = async (
         )
       ),
       button(
-        { class: "btn btn-secondary", onclick: `select_and_run_${rndid}()` },
+        {
+          type: "button",
+          class: "btn btn-secondary",
+          onclick: `select_and_run_${rndid}()`,
+        },
         "OK"
       )
     ) +
