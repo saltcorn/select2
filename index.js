@@ -187,4 +187,5 @@ module.exports = {
       css: `${base_headers}/select2.min.css`,
     },
   ],
+  ready_for_mobile: true,
 };
