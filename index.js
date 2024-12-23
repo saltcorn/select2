@@ -119,14 +119,20 @@ const select2 = {
       ) +
       script(
         domReady(
-          `$('#input${text_attr(nm)}').select2({ 
+          `const isWeb = typeof window.parent.saltcorn?.mobileApp === "undefined";
+          let url = "/api/${field.reftable_name}";
+          if (!isWeb) {
+            const { server_path } = parent.saltcorn.data.state.getState().mobileConfig;
+            url = server_path + "/api/${field.reftable_name}";
+          }
+          $('#input${text_attr(nm)}').select2({ 
             width: '100%', 
             ${
               attrs.ajax
                 ? ` minimumInputLength: 2,
             minimumResultsForSearch: 10,
             ajax: {
-                url: "/api/${field.reftable_name}",
+                url: url,
                 dataType: "json",
                 type: "GET",
                 data: function (params) {
@@ -134,6 +140,10 @@ const select2 = {
                     var queryParameters = {
                         ${field.attributes.summary_field}: params.term,
                         approximate: true
+                    }
+                    if (!isWeb) {
+                      const { jwt } = parent.saltcorn.data.state.getState().mobileConfig;
+                      queryParameters.jwt = jwt;
                     }
                     return queryParameters;
                 },
