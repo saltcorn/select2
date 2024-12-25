@@ -91,6 +91,7 @@ const select2 = {
         {
           class: `form-control ${cls} ${field.class || ""}`,
           "data-fieldname": field.form_name,
+          "data-on-cloned": "cloneCb(this)",
           name: text_attr(nm),
           onChange: attrs.onChange,
           id: `input${text_attr(nm)}`,
@@ -118,52 +119,69 @@ const select2 = {
             )
       ) +
       script(
-        domReady(
-          `const isWeb = typeof window.parent.saltcorn?.mobileApp === "undefined";
-          let url = "/api/${field.reftable_name}";
-          if (!isWeb) {
-            const { server_path } = parent.saltcorn.data.state.getState().mobileConfig;
-            url = server_path + "/api/${field.reftable_name}";
-          }
-          $('#input${text_attr(nm)}').select2({ 
-            width: '100%', 
-            ${
-              attrs.ajax
-                ? ` minimumInputLength: 2,
-            minimumResultsForSearch: 10,
-            ajax: {
-                url: url,
-                dataType: "json",
-                type: "GET",
-                data: function (params) {
-        
-                    var queryParameters = {
-                        ${field.attributes.summary_field}: params.term,
-                        approximate: true
-                    }
-                    if (!isWeb) {
-                      const { jwt } = parent.saltcorn.data.state.getState().mobileConfig;
-                      queryParameters.jwt = jwt;
-                    }
-                    return queryParameters;
-                },
-                processResults: function (data) {
-                    if(!data || !data.success) return [];
-                    return {
-                        results: $.map(data.success, function (item) {
-                            return {
-                                text: item.${field.attributes.summary_field},
-                                id: item.id
-                            }
-                        })
-                    };
-                  }},`
-                : ""
-            }
-            dropdownParent: $('#input${text_attr(
-              nm
-            )}').parent(), dropdownCssClass: "select2-dd-${text_attr(nm)}"  });`
-        )
+        domReady(`
+    const isWeb = typeof window.parent.saltcorn?.mobileApp === "undefined";
+    let url = "/api/${field.reftable_name}";
+    if (!isWeb) {
+      const { server_path } = parent.saltcorn.data.state.getState().mobileConfig;
+      url = server_path + "/api/${field.reftable_name}";
+    }
+
+    window.cloneCb = function(select) {
+      const jSelect = $(select)
+      // remove span and script under the original select
+      jSelect.next().remove();
+      jSelect.next().remove();
+      // remove added select2 attributes
+      jSelect.removeClass("select2-hidden-accessible");
+      jSelect.removeAttr("data-select2-id aria-hidden tabindex");
+      jSelect.find("option").removeAttr("data-select2-id");
+      const fName = jSelect.attr("name");
+      // create new select2
+      initSelect2Inp(fName);
+    }
+
+    window.initSelect2Inp = function(fName) {
+      $('#input' + fName).select2({
+        width: '100%',
+        ${
+          attrs.ajax
+            ? ` minimumInputLength: 2,
+        minimumResultsForSearch: 10,
+        ajax: {
+            url: url,
+            dataType: "json",
+            type: "GET",
+            data: function (params) {
+    
+                var queryParameters = {
+                    ${field.attributes.summary_field}: params.term,
+                    approximate: true
+                }
+                if (!isWeb) {
+                  const { jwt } = parent.saltcorn.data.state.getState().mobileConfig;
+                  queryParameters.jwt = jwt;
+                }
+                return queryParameters;
+            },
+            processResults: function (data) {
+                if(!data || !data.success) return [];
+                return {
+                    results: $.map(data.success, function (item) {
+                        return {
+                            text: item.${field.attributes.summary_field},
+                            id: item.id
+                        }
+                    })
+                };
+              }},`
+            : ""
+        }
+        dropdownParent: $('#input' + fName).parent(),
+        dropdownCssClass: "select2-dd-" + fName,
+      });
+    }
+    initSelect2Inp("${text_attr(nm)}");`)
       ) +
       (attrs?.maxHeight
         ? style(
