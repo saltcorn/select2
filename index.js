@@ -129,17 +129,16 @@ const select2 = {
     }
 
     window.cloneCb = function(select) {
+      // remove select2 stuff and reinitialize
       const jSelect = $(select)
-      // remove span and script under the original select
-      jSelect.next().remove();
-      jSelect.next().remove();
-      // remove added select2 attributes
+      const span = jSelect.next();
+      if (span.is("span")) span.remove();
+      const script = jSelect.next();
+      if (script.is("script")) script.remove();
       jSelect.removeClass("select2-hidden-accessible");
       jSelect.removeAttr("data-select2-id aria-hidden tabindex");
       jSelect.find("option").removeAttr("data-select2-id");
-      const fName = jSelect.attr("name");
-      // create new select2
-      initSelect2Inp(fName);
+      initSelect2Inp(jSelect.attr("name"));
     }
 
     window.initSelect2Inp = function(fName) {
