@@ -86,6 +86,7 @@ const select2 = {
       );
     //console.log("select2 attrs", attrs, field);
 
+    const table = Table.findOne({ name: field.reftable_name });
     return (
       tags.select(
         {
@@ -170,7 +171,7 @@ const select2 = {
                     results: $.map(data.success, function (item) {
                         return {
                             text: item.${field.attributes.summary_field},
-                            id: item.id
+                            id: item["${table ? table.pk_name : "id"}"],
                         }
                     })
                 };
