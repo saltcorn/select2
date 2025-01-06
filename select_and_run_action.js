@@ -106,7 +106,8 @@ const run = async (
   viewname,
   { label, action_name },
   state,
-  extra
+  extra,
+  { get_rows_query }
 ) => {
   const req = extra.req;
 
@@ -114,11 +115,7 @@ const run = async (
 
   const table = await Table.findOne({ id: table_id });
 
-  const rows = await table.getJoinedRows({
-    where: {},
-    forPublic: !req.user || req.user.role_id === 100, // TODO in mobile set user null for public
-    forUser: req.user,
-  });
+  const rows = await get_rows_query();
   if (!rows[0]) return "No row selected";
 
   return (
@@ -175,11 +172,24 @@ const go = async (table_id, viewname, cfg, { id, state }, { req }) => {
   return { json: { success: "ok", ...(result || {}) } };
 };
 
+const queries = ({ table_id, req }) => ({
+  async get_rows_query() {
+    const table = Table.findOne({ id: table_id });
+    const rows = await table.getJoinedRows({
+      where: {},
+      forPublic: !req.user || req.user.role_id === 100,
+      forUser: req.user,
+    });
+    return rows;
+  },
+});
+
 module.exports = {
   name: "Select row and run action",
   display_state_form: false,
   get_state_fields,
   configuration_workflow,
   run,
+  queries,
   routes: { go },
 };

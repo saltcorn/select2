@@ -130,11 +130,11 @@ const run = async (
   viewname,
   { relation, maxHeight, where, disabled, ajax, stay_open_on_select },
   state,
-  extra
+  extra,
+  { get_rows_query }
 ) => {
   const { id } = state;
   if (!id) return "need id";
-  const req = extra.req;
 
   if (!relation) {
     throw new Error(
@@ -149,46 +149,13 @@ const run = async (
   }
   const rndid = `bs${Math.round(Math.random() * 100000)}`;
   const [relTableNm, relField, joinFieldNm, valField] = relSplit;
-  const table = await Table.findOne({ id: table_id });
 
   const relTable = await Table.findOne({ name: relTableNm });
   await relTable.getFields();
   const joinField = relTable.fields.find((f) => f.name === joinFieldNm);
   const joinedTable = await Table.findOne({ name: joinField.reftable_name });
-  const rows = await table.getJoinedRows({
-    where: { id },
-    forPublic: !req.user || req.user.role_id === 100, // TODO in mobile set user null for public
-    forUser: req.user,
-    aggregations: {
-      _selected: {
-        table: joinField.reftable_name,
-        ref: "id",
-        subselect: {
-          field: joinFieldNm,
-          table: { name: db.sqlsanitize(relTable.name) }, //legacy, workaround insufficient escape
-          whereField: relField,
-        },
-        field: valField,
-        aggregate: "ARRAY_AGG",
-      },
-    },
-  });
+  const { rows, possibles } = await get_rows_query(id);
   if (!rows[0]) return "No row selected";
-  let possibles = [];
-  if (!ajax) {
-    possibles = await joinedTable.distinctValues(
-      valField,
-      where
-        ? jsexprToWhere(
-            where,
-            { ...rows[0], user: req.user },
-            joinedTable.getFields()
-          )
-        : undefined
-    );
-  } else {
-    possibles = rows[0]._selected || [];
-  }
   possibles.sort((a, b) => {
     const fa = a?.toLowerCase?.();
     const fb = b?.toLowerCase?.();
@@ -202,7 +169,13 @@ const run = async (
     ) +
     script(
       domReady(
-        `$('#${rndid}').select2({ 
+        `const isWeb = typeof window.parent.saltcorn?.mobileApp === "undefined";
+         let url = "/api/${joinedTable.name}";
+         if (!isWeb) {
+           const { server_path } = parent.saltcorn.data.state.getState().mobileConfig;
+           url = server_path + "/api/${joinedTable.name}";
+         }
+          $('#${rndid}').select2({ 
             width: '100%', 
             ${disabled ? "disabled: true," : ""}
             ${stay_open_on_select ? "closeOnSelect: false," : ""}
@@ -213,14 +186,18 @@ const run = async (
                 ? ` minimumInputLength: 2,
             minimumResultsForSearch: 10,
             ajax: {
-                url: "/api/${joinedTable.name}",
+                url: url,
                 dataType: "json",
                 type: "GET",
                 data: function (params) {
-        
+
                     var queryParameters = {
                         ${valField}: params.term,
                         approximate: true
+                    }
+                    if (!isWeb) {
+                      const { jwt } = parent.saltcorn.data.state.getState().mobileConfig;
+                      queryParameters.jwt = jwt;
                     }
                     return queryParameters;
                 },
@@ -310,11 +287,69 @@ const add = async (
   return { json: { success: "ok", ...result } };
 };
 
+const queries = ({
+  table_id,
+  configuration: {
+    relation,
+    maxHeight,
+    where,
+    disabled,
+    ajax,
+    stay_open_on_select,
+  },
+  req,
+}) => ({
+  async get_rows_query(id) {
+    const [relTableNm, relField, joinFieldNm, valField] = relation.split(".");
+    const relTable = Table.findOne({ name: relTableNm });
+    await relTable.getFields();
+    const joinField = relTable.fields.find((f) => f.name === joinFieldNm);
+    const table = Table.findOne({ id: table_id });
+    const joinedTable = Table.findOne({ name: joinField.reftable_name });
+    const rows = await table.getJoinedRows({
+      where: { id },
+      forPublic: !req.user || req.user.role_id === 100, // TODO in mobile set user null for public
+      forUser: req.user,
+      aggregations: {
+        _selected: {
+          table: joinField.reftable_name,
+          ref: "id",
+          subselect: {
+            field: joinFieldNm,
+            table: { name: db.sqlsanitize(relTable.name) }, //legacy, workaround insufficient escape
+            whereField: relField,
+          },
+          field: valField,
+          aggregate: "ARRAY_AGG",
+        },
+      },
+    });
+    if (!rows[0]) return { rows: [], possibles: [] };
+    let possibles = [];
+    if (!ajax) {
+      possibles = await joinedTable.distinctValues(
+        valField,
+        where
+          ? jsexprToWhere(
+              where,
+              { ...rows[0], user: req.user },
+              joinedTable.getFields()
+            )
+          : undefined
+      );
+    } else {
+      possibles = rows[0]._selected || [];
+    }
+    return { rows, possibles };
+  },
+});
+
 module.exports = {
   name: "Select2 many-to-many",
   display_state_form: false,
   get_state_fields,
   configuration_workflow,
   run,
+  queries,
   routes: { remove, add },
 };
