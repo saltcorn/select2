@@ -85,6 +85,7 @@ const select2 = {
         }) + span({ class: "ml-m1" }, "v")
       );
     //console.log("select2 attrs", attrs, field);
+    const rndSuffix = Math.floor(Math.random() * 16777215).toString(16);
 
     const table = Table.findOne({ name: field.reftable_name });
     return (
@@ -95,7 +96,7 @@ const select2 = {
           "data-on-cloned": "cloneCb(this)",
           name: text_attr(nm),
           onChange: attrs.onChange,
-          id: `input${text_attr(nm)}`,
+          id: `input${text_attr(nm)}${rndSuffix}`,
           ...(attrs?.dynamic_where
             ? {
                 "data-selected": v,
@@ -142,7 +143,7 @@ const select2 = {
     }
 
     window.initSelect2Inp = function(fName) {
-      $('#input' + fName).select2({
+      $('#input' + fName + '${rndSuffix}').select2({
         width: '100%',
         ${
           attrs.ajax
@@ -177,8 +178,12 @@ const select2 = {
               }},`
             : ""
         }
-        dropdownParent: $('#input' + fName).parent(),
+        dropdownParent: $('#input' + fName + '${rndSuffix}').parent(),
         dropdownCssClass: "select2-dd-" + fName,
+      });
+      $('#input' + fName + '${rndSuffix}').on('change', (e) => {
+        if (window.handle_identical_fields)
+          handle_identical_fields(e);
       });
     }
     initSelect2Inp("${text_attr(nm)}");`)
