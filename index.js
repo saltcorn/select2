@@ -111,6 +111,7 @@ const select2 = {
               }
             : {}),
         },
+        field.required && attrs.placeholder ? tags.option({ value: "" }, "") : null,
         attrs.ajax
           ? select_options(
               v,
