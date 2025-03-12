@@ -43,6 +43,11 @@ const select2 = {
       type: "String",
     },
     {
+      name: "placeholder",
+      label: "Placeholder",
+      type: "String",
+    },
+    {
       name: "maxHeight",
       label: "max-height px",
       type: "Integer",
@@ -145,6 +150,7 @@ const select2 = {
     window.initSelect2Inp = function(fName) {
       $('#input' + fName + '${rndSuffix}').select2({
         width: '100%',
+        ${attrs.placeholder ? `placeholder: "${attrs.placeholder}",` : ""}
         ${
           attrs.ajax
             ? ` minimumInputLength: 2,
