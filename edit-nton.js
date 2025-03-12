@@ -87,6 +87,11 @@ const configuration_workflow = () =>
                 class: "validate-expression",
               },
               {
+                name: "placeholder",
+                label: "Placeholder",
+                type: "String",
+              },
+              {
                 name: "ajax",
                 label: "Ajax fetch options",
                 type: "Bool",
@@ -128,7 +133,15 @@ const get_state_fields = async (table_id, viewname, { columns }) => [
 const run = async (
   table_id,
   viewname,
-  { relation, maxHeight, where, disabled, ajax, stay_open_on_select },
+  {
+    relation,
+    maxHeight,
+    where,
+    disabled,
+    ajax,
+    stay_open_on_select,
+    placeholder,
+  },
   state,
   extra,
   { get_rows_query }
@@ -181,6 +194,7 @@ const run = async (
             ${stay_open_on_select ? "closeOnSelect: false," : ""}
             dropdownParent: $('#${rndid}').parent(), 
             dropdownCssClass: "select2-dd-${rndid}",
+            ${placeholder ? `placeholder: "${placeholder}",` : ""}
             ${
               ajax
                 ? ` minimumInputLength: 2,
