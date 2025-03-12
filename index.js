@@ -60,6 +60,11 @@ const select2 = {
       type: "Bool",
     },
     {
+      name: "allow_clear",
+      label: "Allow clear",
+      type: "Bool",
+    },
+    {
       name: "label_formula",
       label: "Label formula",
       type: "String",
@@ -111,7 +116,9 @@ const select2 = {
               }
             : {}),
         },
-        field.required && attrs.placeholder ? tags.option({ value: "" }, "") : null,
+        field.required && attrs.placeholder
+          ? tags.option({ value: "" }, "")
+          : null,
         attrs.ajax
           ? select_options(
               v,
@@ -152,6 +159,7 @@ const select2 = {
       $('#input' + fName + '${rndSuffix}').select2({
         width: '100%',
         ${attrs.placeholder ? `placeholder: "${attrs.placeholder}",` : ""}
+        ${attrs.allow_clear ? `allowClear: true,` : ""}
         ${
           attrs.ajax
             ? ` minimumInputLength: 2,
