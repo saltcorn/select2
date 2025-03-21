@@ -200,7 +200,14 @@ const select2 = {
         if (window.handle_identical_fields)
           handle_identical_fields(e);
       });
-    }
+      
+      $('#input' + fName + '${rndSuffix}').on('select2:open', (e) => {
+       const selectId = e.target.id
+
+    $(".select2-search__field[aria-controls='select2-" + selectId + "-results']").each(function (
+        key,
+        value,
+    ){ value.focus();}) });}
     initSelect2Inp("${text_attr(nm)}");`)
       ) +
       (attrs?.maxHeight
@@ -215,6 +222,8 @@ const select2 = {
     );
   },
 };
+//click to focus above from
+//https://stackoverflow.com/a/67691578/19839414
 
 const fieldviews = { select2, select2_filter: require("./filter") };
 
