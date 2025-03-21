@@ -11,7 +11,7 @@ const {
 } = require("@saltcorn/markup/tags");
 const tags = require("@saltcorn/markup/tags");
 const { select_options } = require("@saltcorn/markup/helpers");
-const { features } = require("@saltcorn/data/db/state");
+const { features, getState } = require("@saltcorn/data/db/state");
 const Table = require("@saltcorn/data/models/table");
 const bs5 = features && features.bootstrap5;
 
@@ -164,6 +164,7 @@ const select2 = {
           attrs.ajax
             ? ` minimumInputLength: 2,
         minimumResultsForSearch: 10,
+        language: "${getState().getConfig("default_locale", "en")}",
         ajax: {
             url: url,
             dataType: "json",
