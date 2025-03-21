@@ -8,6 +8,7 @@ you can move the input box with CSS. Try this for you custom CSS in application 
 
 ```css
 .select2-dropdown--below {
+    top: -2.8rem;
 }
 ```
 
