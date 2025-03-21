@@ -164,7 +164,7 @@ const select2 = {
           attrs.ajax
             ? ` minimumInputLength: 2,
         minimumResultsForSearch: 10,
-        language: "${getState().getConfig("default_locale", "en")}",
+        language: "${default_locale}",
         ajax: {
             url: url,
             dataType: "json",
@@ -232,6 +232,8 @@ const base_headers = `/plugins/public/select2@${
   require("./package.json").version
 }`;
 
+const default_locale = getState().getConfig("default_locale", "en");
+
 module.exports = {
   sc_plugin_api_version: 1,
   fieldviews,
@@ -241,6 +243,13 @@ module.exports = {
     {
       script: `${base_headers}/select2.min.js`,
     },
+    ...(default_locale && default_locale !== "en"
+      ? [
+          {
+            script: `${base_headers}/i18n/${default_locale}.js`,
+          },
+        ]
+      : []),
     {
       css: `${base_headers}/select2.min.css`,
     },
