@@ -44,7 +44,6 @@ module.exports = {
       : typeof v === "undefined" || v === null
       ? []
       : [v];
-    console.log("fld optiuons", field.options.length, field.options[0]);
     const options = (field.options || []).map((o) =>
       option({ value: o.value, selected: selected.includes(o.value) }, o.label)
     );
@@ -64,7 +63,6 @@ module.exports = {
       script(
         domReady(`
       function update() {
-       console.log("update")
        const selected = $('#input${cleanNm}filter').select2('data');       
        const sel_ids = selected.map(s=>s.id);
        set_state_field("${nm}", sel_ids, $("#input${cleanNm}filter"))
