@@ -233,7 +233,11 @@ const select2 = {
 //click to focus above from
 //https://stackoverflow.com/a/67691578/19839414
 
-const fieldviews = { select2, select2_filter: require("./filter") };
+const fieldviews = {
+  select2,
+  select2_filter: require("./filter"),
+  select2_strings: require("./filter_strings"),
+};
 
 const base_headers = `/plugins/public/select2@${
   require("./package.json").version
