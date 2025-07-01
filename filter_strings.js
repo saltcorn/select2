@@ -77,8 +77,8 @@ module.exports = {
       script(
         domReady(`
       function update() {
-       const selected = $('#input${cleanNm}filter').select2('data');       
-       const sel_ids = selected.map(s=>s.${table.pk_name});
+       const selected = $('#input${cleanNm}filter').select2('data');
+       const sel_ids = selected.map(s=>s.id);
        set_state_field("${nm}", sel_ids, $("#input${cleanNm}filter"))
       }
       let url = "/api/${table.name}";
