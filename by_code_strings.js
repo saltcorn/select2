@@ -52,21 +52,18 @@ module.exports = {
     formFieldNames,
     user
   ) {
-    console.log("inner field", field.name);
-
     field.options = await eval_statements(field.attributes.code, {
       ...extraCtx,
       user,
       Table,
     });
-    console.log(field.options);
   },
   run: (nm, v, attrs = {}, cls, required, field, state = {}) => {
     const selected = Array.isArray(v)
       ? v
       : typeof v === "undefined" || v === null
       ? []
-      : [v];
+      : v.split(/[\s,]+/);
 
     const options = (field?.options || []).map((o) =>
       option(
@@ -79,23 +76,37 @@ module.exports = {
     );
 
     return (
+      input({
+        type: "hidden",
+        id: `input${text_attr(nm)}`,
+        "data-fieldname": field.form_name,
+        name: text_attr(nm),
+        onChange: attrs.onChange,
+        value: v,
+      }) +
       select(
         {
-          id: `input${text_attr(nm)}`,
+          id: `input${text_attr(nm)}select`,
           class: `form-control ${cls} ${field?.class || ""}`,
-          "data-fieldname": field.form_name,
-          name: text_attr(nm),
-          onChange: attrs.onChange,
           multiple: attrs.multiple ? "multiple" : undefined,
         },
         options
       ) +
       script(
-        domReady(`     
-      $('#input${text_attr(nm)}').select2({ 
-            width: '100%',           
-            dropdownParent: $('#input${text_attr(nm)}').parent(),             
-      });
+        domReady(`   
+      function update() {
+       const selected = $('#input${text_attr(nm)}select').select2('data');
+       const sel_ids = selected.map(s=>s.id);
+            console.log("sel2 selected",selected)
+        $('#input${text_attr(nm)}').val(sel_ids.join(","))
+      }  
+      $('#input${text_attr(nm)}select').select2({ 
+            width: '100%',   
+            tokenSeparators: [',', ' '],        
+            dropdownParent: $('#input${text_attr(
+              nm
+            )}select').parent(),             
+      }).on('select2:select', update).on('select2:unselect', update);
 `)
       )
     );
