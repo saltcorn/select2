@@ -43,7 +43,6 @@ module.exports = {
     },
     { name: "multiple", label: "Multiple", type: "Bool" },
     { name: "create_tags", label: "Create tags", type: "Bool" },
-
   ],
   async fill_options(
     field,
@@ -66,16 +65,31 @@ module.exports = {
       : typeof v === "undefined" || v === null
       ? []
       : v.split(/[\s,]+/);
-
-    const options = (field?.options || []).map((o) =>
-      option(
+    const optionValues = new Set([]);
+    const options = (field?.options || []).map((o) => {
+      const val = or_if_undefined(o.value, o);
+      optionValues.add(val);
+      return option(
         {
-          value: or_if_undefined(o.value, o),
+          value: val,
           selected: selected.includes(or_if_undefined(o.value, o)),
         },
         or_if_undefined(o.label, o)
-      )
-    );
+      );
+    });
+    selected.forEach((s) => {
+      if (!optionValues.has(s)) {
+        options.push(
+          option(
+            {
+              value: s,
+              selected: true,
+            },
+            s
+          )
+        );
+      }
+    });
 
     return (
       input({
@@ -105,7 +119,7 @@ module.exports = {
       $('#input${text_attr(nm)}select').select2({ 
             width: '100%',   
             tokenSeparators: [',', ' '],        
-            ${attrs.create_tags ? `tags: true,`:""}
+            ${attrs.create_tags ? `tags: true,` : ""}
             dropdownParent: $('#input${text_attr(
               nm
             )}select').parent(),             
