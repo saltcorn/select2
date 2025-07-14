@@ -113,7 +113,6 @@ module.exports = {
       function update() {
        const selected = $('#input${text_attr(nm)}select').select2('data');
        const sel_ids = selected.map(s=>s.id);
-            console.log("sel2 selected",selected)
         $('#input${text_attr(nm)}').val(sel_ids.join(","))
       }  
       $('#input${text_attr(nm)}select').select2({ 
