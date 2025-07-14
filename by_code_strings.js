@@ -14,6 +14,8 @@ const { select_options } = require("@saltcorn/markup/helpers");
 const { eval_statements } = require("@saltcorn/data/models/expression");
 const Table = require("@saltcorn/data/models/table");
 
+const or_if_undefined = (x, def) => (typeof x === "undefined" ? def : x);
+
 module.exports = {
   type: "String",
   isEdit: true,
@@ -51,14 +53,13 @@ module.exports = {
     user
   ) {
     console.log("inner field", field.name);
-    
+
     field.options = await eval_statements(field.attributes.code, {
       ...extraCtx,
       user,
       Table,
     });
     console.log(field.options);
-    
   },
   run: (nm, v, attrs = {}, cls, required, field, state = {}) => {
     const selected = Array.isArray(v)
@@ -66,10 +67,15 @@ module.exports = {
       : typeof v === "undefined" || v === null
       ? []
       : [v];
-    console.log("fopts", field);
-    
+
     const options = (field?.options || []).map((o) =>
-      option({ value: o.value, selected: selected.includes(o.value) }, o.label)
+      option(
+        {
+          value: or_if_undefined(o.value, o),
+          selected: selected.includes(or_if_undefined(o.value, o)),
+        },
+        or_if_undefined(o.label, o)
+      )
     );
 
     return (
@@ -85,9 +91,7 @@ module.exports = {
         domReady(`     
       $('#input${text_attr(nm)}').select2({ 
             width: '100%',           
-            dropdownParent: $('#input${text_attr(
-              nm
-            )}').parent(),             
+            dropdownParent: $('#input${text_attr(nm)}').parent(),             
       });
 `)
       )
