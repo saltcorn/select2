@@ -128,7 +128,7 @@ module.exports = {
        const sel_ids = selected.map(s=>s.id);
         $('#input${text_attr(nm)}').val(sel_ids.join("${
           attrs.token_separators ? attrs.token_separators[0] : ","
-        }"))
+        }")).trigger("change");
       }  
       $('#input${text_attr(nm)}select').select2({ 
             width: '100%',   
