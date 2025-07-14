@@ -1,6 +1,6 @@
 {
   "name": "@saltcorn/select2",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Typeahead fieldviews based on select2",
   "main": "index.js",
   "dependencies": {
