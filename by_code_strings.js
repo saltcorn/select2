@@ -20,7 +20,6 @@ module.exports = {
   type: "String",
   isEdit: true,
   configFields: (field) => [
-    { name: "multiple", label: "Multiple", type: "Bool" },
     {
       name: "code",
       label: "Code",
@@ -42,6 +41,9 @@ module.exports = {
         }
       },
     },
+    { name: "multiple", label: "Multiple", type: "Bool" },
+    { name: "create_tags", label: "Create tags", type: "Bool" },
+
   ],
   async fill_options(
     field,
@@ -103,6 +105,7 @@ module.exports = {
       $('#input${text_attr(nm)}select').select2({ 
             width: '100%',   
             tokenSeparators: [',', ' '],        
+            ${attrs.create_tags ? `tags: true,`:""}
             dropdownParent: $('#input${text_attr(
               nm
             )}select').parent(),             
