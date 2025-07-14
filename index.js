@@ -237,6 +237,7 @@ const fieldviews = {
   select2,
   select2_filter: require("./filter"),
   select2_strings: require("./filter_strings"),
+  select2_by_code: require("./by_code_strings"),
 };
 
 const base_headers = `/plugins/public/select2@${
