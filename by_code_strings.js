@@ -43,6 +43,14 @@ module.exports = {
     },
     { name: "multiple", label: "Multiple", type: "Bool" },
     { name: "create_tags", label: "Create tags", type: "Bool" },
+    {
+      name: "token_separators",
+      label: "Token separators",
+      type: "String",
+      showIf: { multiple: true },
+      sublabel:
+        "All the characters used as token separators. The first charactor will be used to join saved string",
+    },
   ],
   async fill_options(
     field,
@@ -60,11 +68,16 @@ module.exports = {
     });
   },
   run: (nm, v, attrs = {}, cls, required, field, state = {}) => {
+    const splitReStr = attrs.token_separators
+      ? `[${attrs.token_separators
+          .split("")
+          .map((c) => (c === " " ? "\\s" : c))}]+`
+      : "[,]+";
     const selected = Array.isArray(v)
       ? v
       : typeof v === "undefined" || v === null
       ? []
-      : v.split(/[\s,]+/);
+      : v.split(new RegExp(splitReStr));
     const optionValues = new Set([]);
     const options = (field?.options || []).map((o) => {
       const val = or_if_undefined(o.value, o);
@@ -113,11 +126,17 @@ module.exports = {
       function update() {
        const selected = $('#input${text_attr(nm)}select').select2('data');
        const sel_ids = selected.map(s=>s.id);
-        $('#input${text_attr(nm)}').val(sel_ids.join(","))
+        $('#input${text_attr(nm)}').val(sel_ids.join("${
+          attrs.token_separators ? attrs.token_separators[0] : ","
+        }"))
       }  
       $('#input${text_attr(nm)}select').select2({ 
             width: '100%',   
-            tokenSeparators: [',', ' '],        
+            tokenSeparators: ${
+              attrs.token_separators
+                ? JSON.stringify(attrs.token_separators.split(""))
+                : "[',']"
+            },        
             ${attrs.create_tags ? `tags: true,` : ""}
             dropdownParent: $('#input${text_attr(
               nm
