@@ -83,6 +83,9 @@ module.exports = {
         {
           id: `input${text_attr(nm)}`,
           class: `form-control ${cls} ${field?.class || ""}`,
+          "data-fieldname": field.form_name,
+          name: text_attr(nm),
+          onChange: attrs.onChange,
           multiple: attrs.multiple ? "multiple" : undefined,
         },
         options
