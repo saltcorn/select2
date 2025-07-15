@@ -122,7 +122,17 @@ module.exports = {
         options
       ) +
       script(
-        domReady(`   
+        domReady(`  
+          function ensure_option(text) {          
+          if (!$('#input${text_attr(nm)}select').find("option[value='" + text + "']").length) {
+              // Create a DOM Option and pre-select by default
+              var newOption = new Option(text, text, true, true);
+              // Append it to the select
+              $('#input${text_attr(nm)}select').append(newOption).trigger('change');
+          } 
+          
+          }
+
       function update() {
        const selected = $('#input${text_attr(nm)}select').select2('data');
        const sel_ids = selected.map(s=>s.id);
@@ -142,6 +152,11 @@ module.exports = {
               nm
             )}select').parent(),             
       }).on('select2:select', update).on('select2:unselect', update);
+      $('#input${text_attr(nm)}').on("set_form_field", (e)=>{
+            const vals = e.target.value.split(/${splitReStr}/)
+            vals.forEach(ensure_option)
+            $('#input${text_attr(nm)}select').val(vals).trigger('change');
+      });
 `)
       )
     );
