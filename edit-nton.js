@@ -178,7 +178,7 @@ const run = async (
   return (
     select(
       { id: rndid, multiple: "multiple", class: "no-form-change" },
-      possibles.map((p) => option({ selected: selected.has(p) }, p))
+      possibles.map((p) => option({ selected: selected.has(p), value: p }, p))
     ) +
     script(
       domReady(
