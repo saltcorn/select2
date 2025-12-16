@@ -23,11 +23,15 @@ const select2_composite_key = {
   /** @type {boolean} */
   isEdit: true,
   blockDisplay: true,
-
   /**
    * @type {object[]}
    */
-
+  fill_options_restrict(field, v) {
+    if (field?.attributes?.ajax) {
+      const pk = Table.findOne(field.reftable_name)?.pk_name;
+      if (pk) return { [pk]: v || null };
+    }
+  },
   configFields: () => [
     {
       name: "neutral_label",
@@ -75,6 +79,11 @@ const select2_composite_key = {
    * @returns {object}
    */
   run: (nm, v, attrs, cls, reqd, field) => {
+    const table = Table.findOne(field.table_id);
+    const refTableName = field.reftable_name;
+    const allFieldToTable = table.fields.filter(
+      (f) => f.reftable_name == refTableName
+    );
     if (attrs.disabled)
       return (
         input({
@@ -96,14 +105,6 @@ const select2_composite_key = {
           name: text_attr(nm),
           onChange: attrs.onChange,
           id: `input${text_attr(nm)}`,
-          ...(attrs?.dynamic_where
-            ? {
-                "data-selected": v,
-                "data-fetch-options": encodeURIComponent(
-                  JSON.stringify(attrs?.dynamic_where)
-                ),
-              }
-            : {}),
         },
         attrs.ajax
           ? select_options(
