@@ -67,6 +67,10 @@ module.exports = {
       Table,
     });
   },
+  read(v) {
+    if (v === "null") return null;
+    else return v;
+  },
   run: (nm, v, attrs = {}, cls, required, field, state = {}) => {
     const splitReStr = attrs.token_separators
       ? `[${attrs.token_separators
@@ -111,7 +115,7 @@ module.exports = {
         "data-fieldname": field.form_name,
         name: text_attr(nm),
         onChange: attrs.onChange,
-        value: v,
+        value: v || "null",
       }) +
       select(
         {
@@ -124,11 +128,15 @@ module.exports = {
       script(
         domReady(`  
           function ensure_option(text) {          
-          if (!$('#input${text_attr(nm)}select').find("option[value='" + text + "']").length) {
+          if (!$('#input${text_attr(
+            nm
+          )}select').find("option[value='" + text + "']").length) {
               // Create a DOM Option and pre-select by default
               var newOption = new Option(text, text, true, true);
               // Append it to the select
-              $('#input${text_attr(nm)}select').append(newOption).trigger('change');
+              $('#input${text_attr(
+                nm
+              )}select').append(newOption).trigger('change');
           } 
           
           }
@@ -138,7 +146,7 @@ module.exports = {
        const sel_ids = selected.map(s=>s.id);
         $('#input${text_attr(nm)}').val(sel_ids.join("${
           attrs.token_separators ? attrs.token_separators[0] : ","
-        }")).trigger("change");
+        }")||"null").trigger("change");
       }  
       $('#input${text_attr(nm)}select').select2({ 
             width: '100%',   
