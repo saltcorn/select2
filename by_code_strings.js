@@ -116,6 +116,7 @@ module.exports = {
         name: text_attr(nm),
         onChange: attrs.onChange,
         value: v || "null",
+        "data-postprocess": "it==='null' ? null: it",
       }) +
       select(
         {
