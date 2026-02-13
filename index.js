@@ -171,13 +171,17 @@ const select2 = {
       $('#input' + fName + '${rndSuffix}').select2({
         width: '100%',
         ${attrs.placeholder ? `placeholder: "${attrs.placeholder}",` : ""}
-        ${attrs.match_beginning ? `matcher: function(params, data) {
+        ${
+          attrs.match_beginning
+            ? `matcher: function(params, data) {
            params.term = params.term || '';
     if (data.text.toUpperCase().indexOf(params.term.toUpperCase()) == 0) {
         return data;
     }
     return false;
-          },` : ""}
+          },`
+            : ""
+        }
         ${attrs.allow_clear ? `allowClear: true,` : ""}
         ${
           attrs.ajax
@@ -200,10 +204,11 @@ const select2 = {
                 }
                 return queryParameters;
             },
-            processResults: function (data) {
+            processResults: function (data, q) {
+                const term = q.term
                 if(!data || !data.success) return [];
                 return {
-                    results: $.map(data.success, function (item) {
+                    results: $.map(data.success${attrs.match_beginning ? `.filter(item=>item.${field.attributes.summary_field}.toString().toLowerCase().startsWith(term.toLowerCase()))` : ""}, function (item) {
                         return {
                             text: item.${field.attributes.summary_field},
                             id: item["${table ? table.pk_name : "id"}"],
