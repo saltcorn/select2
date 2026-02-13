@@ -45,6 +45,11 @@ const select2 = {
       type: "Bool",
     },
     {
+      name: "match_beginning",
+      label: "Match beginning only",
+      type: "Bool",
+    },
+    {
       name: "where",
       label: "Where",
       type: "String",
@@ -166,6 +171,13 @@ const select2 = {
       $('#input' + fName + '${rndSuffix}').select2({
         width: '100%',
         ${attrs.placeholder ? `placeholder: "${attrs.placeholder}",` : ""}
+        ${attrs.match_beginning ? `matcher: function(params, data) {
+           params.term = params.term || '';
+    if (data.text.toUpperCase().indexOf(params.term.toUpperCase()) == 0) {
+        return data;
+    }
+    return false;
+          },` : ""}
         ${attrs.allow_clear ? `allowClear: true,` : ""}
         ${
           attrs.ajax
