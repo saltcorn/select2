@@ -32,7 +32,7 @@ module.exports = {
       validator(s) {
         try {
           let AsyncFunction = Object.getPrototypeOf(
-            async function () {}
+            async function () {},
           ).constructor;
           AsyncFunction(s);
           return true;
@@ -59,7 +59,7 @@ module.exports = {
     extraCtx,
     optionsQuery,
     formFieldNames,
-    user
+    user,
   ) {
     field.options = await eval_statements(field.attributes.code, {
       ...extraCtx,
@@ -80,8 +80,8 @@ module.exports = {
     const selected = Array.isArray(v)
       ? v
       : typeof v === "undefined" || v === null
-      ? []
-      : v.split(new RegExp(splitReStr));
+        ? []
+        : v.split(new RegExp(splitReStr));
     const optionValues = new Set([]);
     const options = (field?.options || []).map((o) => {
       const val = or_if_undefined(o.value, o);
@@ -91,7 +91,7 @@ module.exports = {
           value: val,
           selected: selected.includes(or_if_undefined(o.value, o)),
         },
-        or_if_undefined(o.label, o)
+        or_if_undefined(o.label, o),
       );
     });
     selected.forEach((s) => {
@@ -102,8 +102,8 @@ module.exports = {
               value: s,
               selected: true,
             },
-            s
-          )
+            s,
+          ),
         );
       }
     });
@@ -124,19 +124,19 @@ module.exports = {
           class: `form-control ${cls} ${field?.class || ""}`,
           multiple: attrs.multiple ? "multiple" : undefined,
         },
-        options
+        options,
       ) +
       script(
         domReady(`  
           function ensure_option(text) {          
           if (!$('#input${text_attr(
-            nm
+            nm,
           )}select').find("option[value='" + text + "']").length) {
               // Create a DOM Option and pre-select by default
               var newOption = new Option(text, text, true, true);
               // Append it to the select
               $('#input${text_attr(
-                nm
+                nm,
               )}select').append(newOption).trigger('change');
           } 
           
@@ -158,7 +158,7 @@ module.exports = {
             },        
             ${attrs.create_tags ? `tags: true,` : ""}
             dropdownParent: $('#input${text_attr(
-              nm
+              nm,
             )}select').parent(),             
       }).on('select2:select', update).on('select2:unselect', update);
       $('#input${text_attr(nm)}').on("set_form_field", (e)=>{
@@ -166,7 +166,7 @@ module.exports = {
             vals.forEach(ensure_option)
             $('#input${text_attr(nm)}select').val(vals).trigger('change');
       });
-`)
+`),
       )
     );
   },

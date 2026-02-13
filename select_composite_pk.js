@@ -82,7 +82,7 @@ const select2_composite_key = {
     const table = Table.findOne(field.table_id);
     const refTableName = field.reftable_name;
     const allFieldToTable = table.fields.filter(
-      (f) => f.reftable_name == refTableName
+      (f) => f.reftable_name == refTableName,
     );
     if (attrs.disabled)
       return (
@@ -111,14 +111,14 @@ const select2_composite_key = {
               v,
               { ...field, options: field.options.filter((o) => o.value == v) },
               (attrs || {}).force_required,
-              (attrs || {}).neutral_label
+              (attrs || {}).neutral_label,
             )
           : select_options(
               v,
               field,
               (attrs || {}).force_required,
-              (attrs || {}).neutral_label
-            )
+              (attrs || {}).neutral_label,
+            ),
       ) +
       script(
         domReady(
@@ -164,17 +164,17 @@ const select2_composite_key = {
                 : ""
             }
             dropdownParent: $('#input${text_attr(
-              nm
-            )}').parent(), dropdownCssClass: "select2-dd-${text_attr(nm)}"  });`
-        )
+              nm,
+            )}').parent(), dropdownCssClass: "select2-dd-${text_attr(nm)}"  });`,
+        ),
       ) +
       (attrs?.maxHeight
         ? style(
             `.select2-container--default .select2-dd-${text_attr(
-              nm
+              nm,
             )} .select2-results>.select2-results__options {max-height: ${
               attrs?.maxHeight
-            }px;}`
+            }px;}`,
           )
         : "")
     );

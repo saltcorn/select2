@@ -31,11 +31,11 @@ module.exports = {
     const selected = Array.isArray(v)
       ? v
       : typeof v === "undefined" || v === null
-      ? []
-      : [v];
+        ? []
+        : [v];
 
     const options = (field.options || []).map((o) =>
-      option({ value: o.value, selected: selected.includes(o.value) }, o.label)
+      option({ value: o.value, selected: selected.includes(o.value) }, o.label),
     );
 
     return (
@@ -45,13 +45,13 @@ module.exports = {
           class: `form-control ${cls} ${field.class || ""}`,
           multiple: attrs.multiple ? "multiple" : undefined,
         },
-        options
+        options,
       ) +
       script(
         domReady(`
       function update() {
        const selected = $('#input${text_attr(
-         nm
+         nm,
        )}filter').select2('data');       
        const sel_ids = selected.map(s=>s.id);
        set_state_field("${nm}", sel_ids, $("#input${text_attr(nm)}filter"))
@@ -60,10 +60,10 @@ module.exports = {
             width: '100%',
             ${attrs.stay_open_on_select ? "closeOnSelect: false," : ""}
             dropdownParent: $('#input${text_attr(
-              nm
+              nm,
             )}filter').parent(),             
       }).on('select2:select', update).on('select2:unselect', update);
-`)
+`),
       )
     );
   },

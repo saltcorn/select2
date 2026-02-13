@@ -41,10 +41,10 @@ const configuration_workflow = () =>
         name: "Table selection",
         form: async (context) => {
           const table = Table.findOne(
-            context.table_id || context.exttable_name
+            context.table_id || context.exttable_name,
           );
           const stateActions = Object.entries(getState().actions).filter(
-            ([k, v]) => !v.disableInList
+            ([k, v]) => !v.disableInList,
           );
 
           const stateActionKeys = stateActions.map(([k, v]) => k);
@@ -107,7 +107,7 @@ const run = async (
   { label, action_name },
   state,
   extra,
-  { get_rows_query }
+  { get_rows_query },
 ) => {
   const req = extra.req;
 
@@ -126,9 +126,9 @@ const run = async (
         rows.map((row) =>
           option(
             { value: row[table.pk_name] },
-            interpolate(label, row, req.user)
-          )
-        )
+            interpolate(label, row, req.user),
+          ),
+        ),
       ),
       button(
         {
@@ -136,15 +136,15 @@ const run = async (
           class: "btn btn-secondary",
           onclick: `select_and_run_${rndid}()`,
         },
-        "OK"
-      )
+        "OK",
+      ),
     ) +
     script(
       `function select_and_run_${rndid}() {
             const id = $('#${rndid}').val();
             view_post('${viewname}', 'go', {id, state: ${JSON.stringify(
-        state
-      )}})
+              state,
+            )}})
         }` +
         domReady(
           `$('#${rndid}').select2({ 
@@ -152,8 +152,8 @@ const run = async (
             dropdownParent: $('#${rndid}').parent(), 
             dropdownCssClass: "select2-dd-${rndid}",
 
-        });`
-        )
+        });`,
+        ),
     )
   );
 };

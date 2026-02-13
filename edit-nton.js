@@ -44,7 +44,7 @@ const configuration_workflow = () =>
           for (const { table, key_field } of child_relations) {
             const keyFields = table.fields.filter(
               (f) =>
-                f.type === "Key" && !["_sc_files"].includes(f.reftable_name)
+                f.type === "Key" && !["_sc_files"].includes(f.reftable_name),
             );
             for (const kf of keyFields) {
               const joined_table = await Table.findOne({
@@ -144,20 +144,20 @@ const run = async (
   },
   state,
   extra,
-  { get_rows_query }
+  { get_rows_query },
 ) => {
   const { id } = state;
   if (!id) return "need id";
 
   if (!relation) {
     throw new Error(
-      `Select2 many-to-many view ${viewname} incorrectly configured. No relation chosen`
+      `Select2 many-to-many view ${viewname} incorrectly configured. No relation chosen`,
     );
   }
   const relSplit = relation.split(".");
   if (relSplit.length < 4) {
     throw new Error(
-      `Select2 many-to-many view ${viewname} incorrectly configured. No relation chosen`
+      `Select2 many-to-many view ${viewname} incorrectly configured. No relation chosen`,
     );
   }
   const rndid = `bs${Math.round(Math.random() * 100000)}`;
@@ -178,7 +178,7 @@ const run = async (
   return (
     select(
       { id: rndid, multiple: "multiple", class: "no-form-change" },
-      possibles.map((p) => option({ selected: selected.has(p), value: p }, p))
+      possibles.map((p) => option({ selected: selected.has(p), value: p }, p)),
     ) +
     script(
       domReady(
@@ -234,12 +234,12 @@ const run = async (
         });
         $('#${rndid}').on('select2:select', function (e) {
             view_post('${viewname}', 'add', {id:'${id}', value: e.params.data.id});
-        });`
-      )
+        });`,
+      ),
     ) +
     (maxHeight
       ? style(
-          `.select2-container--default .select2-dd-${rndid} .select2-results>.select2-results__options {max-height: ${maxHeight}px;}`
+          `.select2-container--default .select2-dd-${rndid} .select2-results>.select2-results__options {max-height: ${maxHeight}px;}`,
         )
       : "")
   );
@@ -259,7 +259,7 @@ const remove = async (table_id, viewname, { relation }, { id, value }) => {
       (select id from 
         "${schema}"."${db.sqlsanitize(joinField.reftable_name)}" 
         where "${db.sqlsanitize(valField)}"=$2)`,
-    [id, value]
+    [id, value],
   );
   return { json: { success: "ok" } };
 };
@@ -268,7 +268,7 @@ const add = async (
   viewname,
   { relation, field_values_formula },
   { id, value },
-  { req }
+  { req },
 ) => {
   const table = await Table.findOne({ id: table_id });
   const rows = await table.getJoinedRows({
@@ -296,7 +296,7 @@ const add = async (
       ...extra,
     },
     req.user || { role_id: 100 },
-    result
+    result,
   );
   return { json: { success: "ok", ...result } };
 };
@@ -347,9 +347,9 @@ const queries = ({
           ? jsexprToWhere(
               where,
               { ...rows[0], user: req.user },
-              joinedTable.getFields()
+              joinedTable.getFields(),
             )
-          : undefined
+          : undefined,
       );
     } else {
       possibles = rows[0]._selected || [];

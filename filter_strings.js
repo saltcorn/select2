@@ -43,7 +43,7 @@ module.exports = {
     extraCtx,
     optionsQuery,
     formFieldNames,
-    user
+    user,
   ) {
     if (field.attributes.ajax) field.options = [];
     else field.options = await field.distinct_values();
@@ -52,13 +52,13 @@ module.exports = {
     const selected = Array.isArray(v)
       ? v
       : typeof v === "undefined" || v === null
-      ? []
-      : [v];
+        ? []
+        : [v];
     let opts = field.options || [];
     if (v && !field.options?.length && field.attributes.ajax)
       opts = [{ value: v, label: v }];
     const options = opts.map((o) =>
-      option({ value: o.value, selected: selected.includes(o.value) }, o.label)
+      option({ value: o.value, selected: selected.includes(o.value) }, o.label),
     );
     const cleanNm = text_attr(nm)
       .replaceAll(".", "")
@@ -72,7 +72,7 @@ module.exports = {
           class: `form-control ${cls} ${field.class || ""}`,
           multiple: attrs.multiple ? "multiple" : undefined,
         },
-        options
+        options,
       ) +
       script(
         domReady(`
@@ -126,7 +126,7 @@ module.exports = {
                 : ""
             }
       }).on('select2:select', update).on('select2:unselect', update);
-`)
+`),
       )
     );
   },

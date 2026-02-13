@@ -118,7 +118,7 @@ const select2 = {
             ? {
                 "data-selected": v,
                 "data-fetch-options": encodeURIComponent(
-                  JSON.stringify(attrs?.dynamic_where)
+                  JSON.stringify(attrs?.dynamic_where),
                 ),
               }
             : {}),
@@ -131,14 +131,14 @@ const select2 = {
               v,
               { ...field, options: field.options.filter((o) => o.value == v) },
               (attrs || {}).force_required,
-              (attrs || {}).neutral_label
+              (attrs || {}).neutral_label,
             )
           : select_options(
               v,
               field,
               (attrs || {}).force_required,
-              (attrs || {}).neutral_label
-            )
+              (attrs || {}).neutral_label,
+            ),
       ) +
       script(
         domReady(`
@@ -216,15 +216,15 @@ const select2 = {
         key,
         value,
     ){ value.focus();}) });}
-    initSelect2Inp("${text_attr(nm)}");`)
+    initSelect2Inp("${text_attr(nm)}");`),
       ) +
       (attrs?.maxHeight
         ? style(
             `.select2-container--default .select2-dd-${text_attr(
-              nm
+              nm,
             )} .select2-results>.select2-results__options {max-height: ${
               attrs?.maxHeight
-            }px;}`
+            }px;}`,
           )
         : "")
     );
