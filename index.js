@@ -170,7 +170,7 @@ const select2 = {
     window.initSelect2Inp = function(fName) {
       $('#input' + fName + '${rndSuffix}').select2({
         width: '100%',
-        ${attrs.placeholder ? `placeholder: "${attrs.placeholder}",` : ""}
+        ${attrs.placeholder||attrs.allow_clear ? `placeholder: "${attrs.placeholder||""}",` : ""}
         ${
           attrs.match_beginning
             ? `matcher: function(params, data) {
