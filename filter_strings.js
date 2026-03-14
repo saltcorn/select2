@@ -14,6 +14,7 @@ const { select_options } = require("@saltcorn/markup/helpers");
 const { features, getState } = require("@saltcorn/data/db/state");
 const default_locale = getState().getConfig("default_locale", "en");
 const Table = require("@saltcorn/data/models/table");
+const { jsexprToWhere } = require("@saltcorn/data/models/expression");
 
 module.exports = {
   type: "String",
@@ -26,6 +27,7 @@ module.exports = {
       type: "Bool",
     },
     { name: "multiple", label: "Multiple", type: "Bool" },
+    { name: "where", label: "Where", type: "String" },
 
     /*
     //Doesnt work
@@ -45,8 +47,16 @@ module.exports = {
     formFieldNames,
     user,
   ) {
+    let wh = {};
+    if (field.attributes.where) {
+      wh = jsexprToWhere(
+        field.attributes.where,
+        {},
+        Table.findOne({ id: field.table_id }).fields,
+      );
+    }
     if (field.attributes.ajax) field.options = [];
-    else field.options = await field.distinct_values();
+    else field.options = await field.distinct_values(undefined, wh);
   },
   run: (nm, v, attrs = {}, cls, required, field, state = {}) => {
     const selected = Array.isArray(v)
