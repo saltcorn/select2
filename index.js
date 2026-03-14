@@ -170,7 +170,7 @@ const select2 = {
     window.initSelect2Inp = function(fName) {
       $('#input' + fName + '${rndSuffix}').select2({
         width: '100%',
-        ${attrs.placeholder||attrs.allow_clear ? `placeholder: "${attrs.placeholder||""}",` : ""}
+        ${attrs.placeholder || attrs.allow_clear ? `placeholder: "${attrs.placeholder || ""}",` : ""}
         ${
           attrs.match_beginning
             ? `matcher: function(params, data) {
@@ -225,7 +225,10 @@ const select2 = {
         if (window.handle_identical_fields)
           handle_identical_fields(e);
       });
-      
+       $('#input' + fName + '${rndSuffix}').on('set_form_field', (e) => {
+        $('#input' + fName + '${rndSuffix}').val(e.target.value)
+        $('#input' + fName + '${rndSuffix}').trigger('change')
+      });
       $('#input' + fName + '${rndSuffix}').on('select2:open', (e) => {
        const selectId = e.target.id
 
