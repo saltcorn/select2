@@ -51,7 +51,7 @@ module.exports = {
     if (field.attributes.where) {
       wh = jsexprToWhere(
         field.attributes.where,
-        {},
+        { ...(extraCtx || {}) },
         Table.findOne({ id: field.table_id }).fields,
       );
     }
