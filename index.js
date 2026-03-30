@@ -13,6 +13,8 @@ const tags = require("@saltcorn/markup/tags");
 const { select_options } = require("@saltcorn/markup/helpers");
 const { features, getState } = require("@saltcorn/data/db/state");
 const Table = require("@saltcorn/data/models/table");
+const { jsexprToWhere } = require("@saltcorn/data/models/expression");
+const { objectToQueryString } = require("@saltcorn/data/utils");
 const bs5 = features && features.bootstrap5;
 
 const select2 = {
@@ -110,6 +112,15 @@ const select2 = {
     const rndSuffix = Math.floor(Math.random() * 16777215).toString(16);
 
     const table = Table.findOne({ name: field.reftable_name });
+    let ajaxWhere = "";
+    if (attrs.where && attrs.ajax) {
+      const wh = jsexprToWhere(
+        field.attributes.where,
+        {},
+        Table.findOne({ id: field.table_id }).fields,
+      );
+      ajaxWhere = `?${objectToQueryString(wh)}`;
+    }
     return (
       tags.select(
         {
@@ -148,10 +159,10 @@ const select2 = {
       script(
         domReady(`
     const isWeb = typeof window.parent.saltcorn?.mobileApp === "undefined";
-    let url = "/api/${field.reftable_name}";
+    let url = "/api/${field.reftable_name}${ajaxWhere}";
     if (!isWeb) {
       const { server_path } = parent.saltcorn.data.state.getState().mobileConfig;
-      url = server_path + "/api/${field.reftable_name}";
+      url = server_path + url;
     }
 
     window.cloneCb = function(select) {
