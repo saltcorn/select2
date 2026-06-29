@@ -252,15 +252,13 @@ const remove = async (table_id, viewname, { relation }, { id, value }) => {
   await joinTable.getFields();
   const joinField = joinTable.fields.find((f) => f.name === joinFieldNm);
   const schema = db.getTenantSchema();
-  await db.query(
-    `delete from "${schema}"."${db.sqlsanitize(joinTable.name)}" 
-      where "${db.sqlsanitize(relField)}"=$1 and 
-      "${db.sqlsanitize(joinFieldNm)}" in 
-      (select id from 
-        "${schema}"."${db.sqlsanitize(joinField.reftable_name)}" 
-        where "${db.sqlsanitize(valField)}"=$2)`,
-    [id, value],
-  );
+  const targetTable = Table.findOne(joinField.reftable_name);
+  const targetRows = await targetTable.getRows({ [valField]: value });
+  await joinTable.deleteRows({
+    [relField]: id,
+    [joinFieldNm]: { in: targetRows.map((r) => r[targetTable.pk_name]) },
+  });
+
   return { json: { success: "ok" } };
 };
 const add = async (
